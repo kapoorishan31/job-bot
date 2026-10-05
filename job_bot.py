@@ -163,20 +163,20 @@ def fetch_emails():
 
 
 def notify(job, lvl, s):
-    phone, apikey = os.environ["WHATSAPP_PHONE"], os.environ["CALLMEBOT_APIKEY"]
-    lines = [f"\U0001F6A8 *{lvl} match* ({s}/100)", job["title"]]
+    token, chat = os.environ["TELEGRAM_BOT_TOKEN"], os.environ["TELEGRAM_CHAT_ID"]
+    lines = [f"\U0001F6A8 {lvl} match ({s}/100)", job["title"]]
     if job["company"]:
         lines.append(f"Company: {job['company']}")
     if job["location"]:
         lines.append(f"Location: {job['location']}")
     lines.append(job["url"])
-    r = requests.get(
-        "https://api.callmebot.com/whatsapp.php",
-        params={"phone": phone, "text": "\n".join(lines), "apikey": apikey},
-        timeout=30,
+    r = requests.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        data={"chat_id": chat, "text": "\n".join(lines)},
+        timeout=20,
     )
     if r.status_code != 200:
-        print(f"whatsapp send failed: {r.status_code} {r.text[:200]}")
+        print(f"telegram send failed: {r.status_code} {r.text[:200]}")
 
 
 def main():
